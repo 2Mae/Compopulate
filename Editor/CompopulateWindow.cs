@@ -17,9 +17,10 @@ namespace Compopulate
         IMGUIContainer imgui;
 
         public bool warnIfNull = false;
+        public bool interuptOnPlay = true;
 
         [MenuItem("Window/Compopulate %g")]
-        static void ShowWindow() { GetWindow<CompopulateWindow>().OnShow(); }
+        public static void ShowWindow() { GetWindow<CompopulateWindow>().OnShow(); }
         public void OnShow()
         {
             RefreshSession();
@@ -27,7 +28,7 @@ namespace Compopulate
 
         private void OnEnable()
         {
-            session = new Session();
+            session = new Session(); //Debug.Log("Created new session");
             titleContent = new GUIContent("Compopulate");
             rootVisualElement.RegisterCallback<KeyDownEvent>(OnKeyDown);
             rootVisualElement.Add(label = new Label());
@@ -64,6 +65,7 @@ namespace Compopulate
                 warnIfNull = !warnIfNull;
                 listView.Refresh();
             });
+            menu.AddItem(new GUIContent($"Interupt play"), interuptOnPlay, () => { interuptOnPlay = !interuptOnPlay; });
             menu.AddSeparator("");
             menu.AddItem(new GUIContent("Create some test objects"), false, CreateSomeTestObjects);
 
