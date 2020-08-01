@@ -38,7 +38,7 @@ namespace Compopulate
             this.window = window;
             field = items[i];
             itemNumber.text = i.ToString();
-            text.text = $"{objectName}:{scriptType}.{fieldName}({fieldType}) = {field.preCheck}";
+            text.text = $"{field.script.gameObject.scene.name}:{objectName}:{scriptType}.{fieldName}({fieldType}) = {field.preCheck}";
             icon1.image = GetImageFromCheck(field.preCheck);
 
             if (field.processed)

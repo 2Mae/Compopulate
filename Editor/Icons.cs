@@ -14,8 +14,8 @@ namespace Compopulate
 
         public static Texture conflictNull => EditorGUIUtility.IconContent("CollabError").image;
         public static Texture conflictNullFixed => EditorGUIUtility.IconContent("CollabChanges Icon").image;
-        public static Texture skip => EditorGUIUtility.IconContent("icon dropdown").image;
+        public static Texture dropdownTriangle => EditorGUIUtility.IconContent("icon dropdown").image;
         public static Texture blank => EditorGUIUtility.IconContent("d_RectTransformBlueprint").image;
-
+        public static Texture cog => EditorGUIUtility.IconContent("Settings").image;
     }
 }

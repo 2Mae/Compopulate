@@ -11,13 +11,15 @@ namespace Compopulate
     {
         ListView listView;
 
-        Label label;
-
         public Session session;
         IMGUIContainer imgui;
 
         public bool warnIfNull = false;
         public bool interuptOnPlay = true;
+
+        public VisualElement toolbar;
+
+        public VisualElement menu;
 
         [MenuItem("Window/Compopulate %g")]
         public static void ShowWindow() { GetWindow<CompopulateWindow>().OnShow(); }
@@ -26,13 +28,78 @@ namespace Compopulate
             RefreshSession();
         }
 
+        void InitialiseToolbar()
+        {
+            toolbar = new VisualElement();
+            toolbar.style.flexDirection = FlexDirection.Row;
+            toolbar.style.unityTextAlign = TextAnchor.MiddleCenter;
+            toolbar.style.borderBottomColor = Color.gray;
+            toolbar.style.borderBottomWidth = 1;
+            toolbar.style.backgroundColor = new Color(1, 1, 1, 0.2f);
+            toolbar.style.height = 20;
+            toolbar.Add(menu = new ToolbarElement(() => DropDown(), "Menu"));
+            toolbar.RegisterCallback<FocusEvent>(ToolbarFocus);
+
+            rootVisualElement.Add(toolbar);
+        }
+
+        private void ToolbarFocus(FocusEvent evt)
+        {
+            Debug.Log("fdsaf");
+        }
+
+        public class ToolbarElement : VisualElement
+        {
+            Action action;
+            public ToolbarElement(Action action, string labelText = "", Texture icon = null)
+            {
+                this.action = action;
+                style.flexDirection = FlexDirection.Row;
+                style.borderRightColor = Color.gray;
+                style.borderRightWidth = 1;
+
+                if (labelText != "")
+                {
+                    Label l = new Label(labelText);
+                    l.style.paddingLeft = l.style.paddingRight = 3;
+                    Add(l);
+                }
+
+                if (icon != null)
+                {
+                    Image image = new Image() { image = icon };
+                    Add(image);
+                }
+
+                RegisterCallback<MouseDownEvent>(Click);
+                RegisterCallback<MouseEnterEvent>(Enter);
+                RegisterCallback<MouseLeaveEvent>(Leave);
+            }
+
+            private void Click(MouseDownEvent evt)
+            {
+                action.Invoke();
+            }
+
+            private void Leave(MouseLeaveEvent evt)
+            {
+                style.backgroundColor = new Color(0, 0, 0, 0);
+            }
+
+            private void Enter(MouseEnterEvent evt)
+            {
+                style.backgroundColor = new Color(0, 0, 0, 0.1f);
+            }
+        }
+
         private void OnEnable()
         {
+
             session = new Session(); //Debug.Log("Created new session");
             titleContent = new GUIContent("Compopulate");
-            rootVisualElement.RegisterCallback<KeyDownEvent>(OnKeyDown);
-            rootVisualElement.Add(label = new Label());
-            label.style.unityTextAlign = TextAnchor.UpperRight;
+
+            InitialiseToolbar();
+            rootVisualElement.RegisterCallback<KeyDownEvent>(OnKeyDown, TrickleDown.TrickleDown);
             InitiateListView();
             RefreshSession();
             Undo.undoRedoPerformed += OnUndoRedo;
@@ -48,34 +115,29 @@ namespace Compopulate
             var targetElement = evt.target as VisualElement;
             if (targetElement == null)
                 return;
-
-            DropDown(targetElement);
         }
 
-        private void DropDown(VisualElement targetElement)
+        private void DropDown()
         {
-            var menu = new GenericMenu();
+            var genericMenu = new GenericMenu();
 
-            menu.AddItem(new GUIContent("Refresh (R)"), false, RefreshSession);
-            menu.AddItem(new GUIContent("Process all (Ctrl+Space)"), false, ProcessAll);
-            menu.AddItem(new GUIContent("Process selected (Space)"), false, ProcessSelected);
-            menu.AddItem(new GUIContent("Show selected in hierarchy (P)"), false, PingSelected);
-            menu.AddItem(new GUIContent($"Warn if null"), warnIfNull, () =>
+            genericMenu.AddItem(new GUIContent("Refresh (R)"), false, RefreshSession);
+            genericMenu.AddItem(new GUIContent("Process all (Ctrl+Space)"), false, ProcessAll);
+            genericMenu.AddItem(new GUIContent("Process selected (Space)"), false, ProcessSelected);
+            genericMenu.AddItem(new GUIContent("Show selected in hierarchy (P)"), false, PingSelected);
+            genericMenu.AddItem(new GUIContent($"Warn if null"), warnIfNull, () =>
             {
                 warnIfNull = !warnIfNull;
                 listView.Refresh();
             });
-            menu.AddItem(new GUIContent($"Interupt play"), interuptOnPlay, () => { interuptOnPlay = !interuptOnPlay; });
-            menu.AddSeparator("");
-            menu.AddItem(new GUIContent("Create some test objects"), false, CreateSomeTestObjects);
+            genericMenu.AddItem(new GUIContent($"Interupt play"), interuptOnPlay, () => { interuptOnPlay = !interuptOnPlay; });
+            genericMenu.AddSeparator("");
+            genericMenu.AddItem(new GUIContent("Create some test objects"), false, CreateSomeTestObjects);
 
+            var menuPosition = new Vector2(menu.layout.xMin, menu.layout.yMax);
+            var menuRect = new Rect(menuPosition, menu.layout.size);
 
-            // Get position of menu on top of target element.
-            var menuPosition = new Vector2(targetElement.layout.xMin, targetElement.layout.yMin);
-            //menuPosition = Vector2.zero;
-            var menuRect = new Rect(menuPosition, Vector2.zero);
-
-            menu.DropDown(menuRect);
+            genericMenu.DropDown(menuRect);
         }
 
         public void CreateSomeTestObjects()
@@ -109,7 +171,7 @@ namespace Compopulate
             if (e.keyCode == KeyCode.M)
             {
                 e.PreventDefault();
-                DropDown(rootVisualElement);
+                DropDown();
             }
 
             if (e.keyCode == KeyCode.Space)
@@ -138,7 +200,7 @@ namespace Compopulate
 
         private void ProcessSelected()
         {
-            if (GetSelectedField().processed) { return; }
+            if (GetSelectedField() == null || GetSelectedField().processed) { return; }
 
             session.ProcessField(GetSelectedField());
             listView.Refresh();
@@ -147,9 +209,13 @@ namespace Compopulate
 
         private void ProcessAll()
         {
-            session.ProcessAll();
-            listView.Refresh();
-            listView.selectedIndex = 0;
+            if (session.fields.Count != 0)
+            {
+                session.ProcessAll();
+                listView.Refresh();
+                listView.selectedIndex = 0;
+            }
+
         }
 
         private Field GetSelectedField()
@@ -165,14 +231,6 @@ namespace Compopulate
                 listView.selectedIndex = 0;
             }
             listView.Refresh();
-            if (session.fields.Count == 0)
-            {
-                label.text = "No fields found. Right click or (M) for menu";
-            }
-            else
-            {
-                label.text = "Right click or (M) for menu";
-            }
         }
         public void InitiateListView()
         {
