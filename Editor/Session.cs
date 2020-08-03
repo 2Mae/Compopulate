@@ -32,7 +32,7 @@ namespace Compopulate
 
                         if (notHideInInspector && (hasSerializeField || fieldInfo.IsPublic))
                         {
-                            this.fields.Add(new Field(components[i], fieldInfo));
+                            this.fields.Add(new Field(components[i], fieldInfo, compopulateAttribute.flags));
                         }
                         else
                         {
