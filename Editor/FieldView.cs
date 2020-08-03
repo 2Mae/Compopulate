@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEditor;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -29,36 +27,18 @@ namespace Compopulate
             this.window = window;
         }
 
-        private void MouseDown(MouseDownEvent evt)
-        {
-            if (evt.button != (int)MouseButton.RightMouse)
-                return;
-
-            var targetElement = evt.target as VisualElement;
-            if (targetElement == null)
-                return;
-
-            Debug.Log("fadsfasd");
-            DropDown();
-        }
-
         public string FromLastDot(string input)
         {
             int i = input.LastIndexOf('.');
             return input.Substring(i + 1);
         }
 
-        public void Bind(CompopulateWindow window, List<Field> items, int index)
+        public void Bind(CompopulateWindow window, List<Field> items, int i)
         {
             this.window = window;
-            field = items[index];
-            itemNumber.text = index.ToString();
-            string flags = "";
-            for (int i = 0; i < field.flags.Count; i++)
-            {
-                flags += field.flags[i];
-            }
-            text.text = $"{field.script.gameObject.scene.name}:{objectName}:{scriptType}.{fieldName}({fieldType})({flags}) = {field.preCheck}";
+            field = items[i];
+            itemNumber.text = i.ToString();
+            text.text = $"{field.script.gameObject.scene.name}:{objectName}:{scriptType}.{fieldName}({fieldType}) = {field.preCheck}";
             icon1.image = GetImageFromCheck(field.preCheck);
 
             if (field.processed)
@@ -77,32 +57,6 @@ namespace Compopulate
                     postCheckLabel.text = " (no change)";
                 }
             }
-
-            RegisterCallback<MouseDownEvent>(MouseDown, TrickleDown.TrickleDown);
-        }
-
-        private void DropDown()
-        {
-            var genericMenu = new GenericMenu();
-
-            genericMenu.AddItem(new GUIContent("Process"), false, () =>
-            {
-                window.session.ProcessField(field);
-                window.listView.Refresh();
-            });
-            genericMenu.AddItem(new GUIContent("Test1"), false, Testdfsa);
-            genericMenu.AddItem(new GUIContent("Test2"), false, Testdfsa);
-            genericMenu.AddItem(new GUIContent("Test3"), false, Testdfsa);
-
-            var menuPosition = new Vector2(layout.xMin, layout.yMax);
-            var menuRect = new Rect(menuPosition, layout.size + layout.size);
-
-            genericMenu.DropDown(menuRect);
-        }
-
-        private void Testdfsa()
-        {
-            throw new NotImplementedException();
         }
 
         private Texture GetImageFromCheck(Field.Check p)
@@ -120,7 +74,7 @@ namespace Compopulate
                     image = Icons.check;
                     break;
                 case Field.Check.ConfirmedNull:
-                    if (!field.allowNull)
+                    if (warnIfNull)
                     {
                         image = Icons.emptyWarn;
                     }

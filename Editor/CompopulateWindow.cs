@@ -9,7 +9,7 @@ namespace Compopulate
 {
     public class CompopulateWindow : EditorWindow
     {
-        public ListView listView;
+        ListView listView;
 
         public Session session;
         IMGUIContainer imgui;

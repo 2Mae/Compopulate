@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 
@@ -7,8 +6,6 @@ namespace Compopulate
 {
     public class Field
     {
-        public bool allowNull = true;
-        public List<string> flags;
         public Component script = null;
         public FieldInfo fieldInfo = null;
         public bool processed;
@@ -31,9 +28,8 @@ namespace Compopulate
 
 
 
-        public Field(Component script, FieldInfo fieldInfo, string[] flags)
+        public Field(Component script, FieldInfo fieldInfo)
         {
-            this.flags = new List<string>(flags);
             this.script = script;
             this.fieldInfo = fieldInfo;
 
@@ -41,8 +37,6 @@ namespace Compopulate
             after = script.GetComponent(fieldInfo.FieldType);
 
             preCheck = GetCheck(before, after);
-
-            allowNull = this.flags.Contains(Flags.allowNull);
         }
 
         public Check GetCheck(Component A, Component B)
