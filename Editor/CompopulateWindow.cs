@@ -9,14 +9,14 @@ namespace Compopulate
 {
     public class CompopulateWindow : EditorWindow
     {
+
+        public SettingsObject settings;
         public ListView listView;
 
         public Session session;
         IMGUIContainer imgui;
 
-        public bool warnIfNull = false;
-        public bool interuptOnPlay = true;
-
+        public bool warnIfNull => settings.warnIfNull;
         public VisualElement toolbar;
 
         public VisualElement menu;
@@ -46,6 +46,11 @@ namespace Compopulate
         private void ToolbarFocus(FocusEvent evt)
         {
             Debug.Log("fdsaf");
+        }
+
+        public void SaveSettingsChanges()
+        {
+            SettingsHandler.Write(settings);
         }
 
         public class ToolbarElement : VisualElement
@@ -94,7 +99,7 @@ namespace Compopulate
 
         private void OnEnable()
         {
-
+            settings = SettingsHandler.Load();
             session = new Session(); //Debug.Log("Created new session");
             titleContent = new GUIContent("Compopulate");
 
@@ -125,12 +130,15 @@ namespace Compopulate
             genericMenu.AddItem(new GUIContent("Process all (Ctrl+Space)"), false, ProcessAll);
             genericMenu.AddItem(new GUIContent("Process selected (Space)"), false, ProcessSelected);
             genericMenu.AddItem(new GUIContent("Show selected in hierarchy (P)"), false, PingSelected);
-            genericMenu.AddItem(new GUIContent($"Warn if null"), warnIfNull, () =>
+            genericMenu.AddItem(new GUIContent($"Warn if null"), settings.warnIfNull, () =>
             {
-                warnIfNull = !warnIfNull;
+                settings.warnIfNull = !settings.warnIfNull;
+                SaveSettingsChanges();
                 listView.Refresh();
             });
-            genericMenu.AddItem(new GUIContent($"Interupt play"), interuptOnPlay, () => { interuptOnPlay = !interuptOnPlay; });
+            genericMenu.AddItem(new GUIContent($"Interupt play"), settings.checkBeforePlay, () => {
+                settings.checkBeforePlay = !settings.checkBeforePlay;
+                });
             genericMenu.AddSeparator("");
             genericMenu.AddItem(new GUIContent("Create some test objects"), false, CreateSomeTestObjects);
 
@@ -234,6 +242,7 @@ namespace Compopulate
         }
         public void InitiateListView()
         {
+
             const int itemHeight = 20;
             Func<VisualElement> makeItem = () => new FieldView();
             Action<VisualElement, int> bindItem = (e, i) => (e as FieldView).Bind(this, session.fields, i);

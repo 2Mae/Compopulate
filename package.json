@@ -1,6 +1,6 @@
 {
     "name": "com.toriously.compopulate",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "displayName": "Compopulate",
     "description": "Autofill component fields with GetComponent",
     "unity": "2019.1",

@@ -38,7 +38,6 @@ namespace Compopulate
             if (targetElement == null)
                 return;
 
-            Debug.Log("fadsfasd");
             DropDown();
         }
 
@@ -50,6 +49,7 @@ namespace Compopulate
 
         public void Bind(CompopulateWindow window, List<Field> items, int index)
         {
+
             this.window = window;
             field = items[index];
             itemNumber.text = index.ToString();
@@ -58,12 +58,13 @@ namespace Compopulate
             {
                 flags += field.flags[i];
             }
-            text.text = $"{field.script.gameObject.scene.name}:{objectName}:{scriptType}.{fieldName}({fieldType})({flags}) = {field.preCheck}";
+
             icon1.image = GetImageFromCheck(field.preCheck);
+
+            text.text = $"{field.script.gameObject.scene.name}:{objectName}:{scriptType}.{fieldName}({fieldType})({flags}) = {field.preCheck}";
 
             if (field.processed)
             {
-
                 Field.Check postCheck = field.GetCheck(field.value, field.after);
                 icon2.image = GetImageFromCheck(postCheck);
                 icon1.style.opacity = 0.4f;

@@ -8,13 +8,22 @@ namespace Compopulate
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         static void OnBeforeSceneLoadRuntimeMethod()
         {
-            if (!EditorWindow.GetWindow<CompopulateWindow>().interuptOnPlay) { return; }
+            SettingsObject settings = SettingsHandler.Load();
+
+            if (!settings.checkBeforePlay)
+            {
+                return;
+            }
 
             Session session = new Session();
             session.Refresh();
             for (int i = 0; i < session.fields.Count; i++)
             {
-                if (!session.fields[i].confirmed)
+                //Todo: Make this not an abomination.
+                Field field = session.fields[i];
+                bool confirmed = (field.preCheck == Field.Check.ConfirmedValue ||
+                ((field.allowNull || !settings.warnIfNull) && field.preCheck == Field.Check.ConfirmedNull));
+                if (!confirmed)
                 {
                     EditorApplication.ExitPlaymode();
                     EditorApplication.playModeStateChanged += Changed;

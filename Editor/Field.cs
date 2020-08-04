@@ -12,7 +12,7 @@ namespace Compopulate
         public Component script = null;
         public FieldInfo fieldInfo = null;
         public bool processed;
-        public bool confirmed => before == after;
+        public bool confirmed => (before == after && (allowNull || preCheck == Check.ConfirmedValue));
         public Component before;
         public Component after;
 
@@ -28,8 +28,6 @@ namespace Compopulate
         {
             UnProcessed, Skipped, Override, Applied
         }
-
-
 
         public Field(Component script, FieldInfo fieldInfo, string[] flags)
         {
