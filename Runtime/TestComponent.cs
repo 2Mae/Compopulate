@@ -9,12 +9,13 @@ namespace Tests
     {
         [Compopulate.Att] public MeshFilter testField;
 
+#if UNITY_EDITOR
         public static void CreateSomeTestObjects()
         {
 
             Undo.SetCurrentGroupName("Create Compopulate Test Objects");
             int group = Undo.GetCurrentGroup();
-            
+
             var parent = new GameObject("CompopulateTest");
             Undo.RegisterCreatedObjectUndo(parent, parent.name);
             List<TestComponent> children = new List<TestComponent>();
@@ -46,5 +47,6 @@ namespace Tests
 
             EditorGUIUtility.PingObject(children[0]);//Ping to unfold in hierarchy
         }
+#endif
     }
 }
