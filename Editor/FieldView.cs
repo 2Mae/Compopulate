@@ -86,14 +86,19 @@ namespace Compopulate
         {
             var genericMenu = new GenericMenu();
 
-            genericMenu.AddItem(new GUIContent("Process"), false, () =>
+            genericMenu.AddItem(new GUIContent("Process (Space)"), false, () =>
             {
                 window.session.ProcessField(field);
                 window.listView.Refresh();
             });
+            genericMenu.AddItem(new GUIContent("Select game object (Right)"), false, () =>
+            {
+                EditorGUIUtility.PingObject(field.script);
+                Selection.activeGameObject = field.script.gameObject;
+            });
+            genericMenu.AddSeparator("");
+            genericMenu.AddItem(new GUIContent("Test0"), false, Testdfsa);
             genericMenu.AddItem(new GUIContent("Test1"), false, Testdfsa);
-            genericMenu.AddItem(new GUIContent("Test2"), false, Testdfsa);
-            genericMenu.AddItem(new GUIContent("Test3"), false, Testdfsa);
 
             var menuPosition = new Vector2(layout.xMin, layout.yMax);
             var menuRect = new Rect(menuPosition, layout.size + layout.size);

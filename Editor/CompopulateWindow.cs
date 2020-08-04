@@ -128,8 +128,6 @@ namespace Compopulate
 
             genericMenu.AddItem(new GUIContent("Refresh (R)"), false, RefreshSession);
             genericMenu.AddItem(new GUIContent("Process all (Ctrl+Space)"), false, ProcessAll);
-            genericMenu.AddItem(new GUIContent("Process selected (Space)"), false, ProcessSelected);
-            genericMenu.AddItem(new GUIContent("Show selected in hierarchy (P)"), false, PingSelected);
             genericMenu.AddItem(new GUIContent($"Warn if null"), settings.warnIfNull, () =>
             {
                 settings.warnIfNull = !settings.warnIfNull;
