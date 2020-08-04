@@ -134,11 +134,12 @@ namespace Compopulate
             {
                 settings.warnIfNull = !settings.warnIfNull;
                 SaveSettingsChanges();
-                listView.Refresh();
             });
-            genericMenu.AddItem(new GUIContent($"Interupt play"), settings.checkBeforePlay, () => {
+            genericMenu.AddItem(new GUIContent($"Interupt play"), settings.checkBeforePlay, () =>
+            {
                 settings.checkBeforePlay = !settings.checkBeforePlay;
-                });
+                SaveSettingsChanges();
+            });
             genericMenu.AddSeparator("");
             genericMenu.AddItem(new GUIContent("Create some test objects"), false, CreateSomeTestObjects);
 
